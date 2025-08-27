@@ -64,6 +64,9 @@ public class PlayerCharacter : MonoBehaviour, ICharacterController
     [Range(0f, 1f)]
     [SerializeField] private float crouchCameraTargetHeight = 0.7f;
 
+    public event System.Action<Stance> OnStanceChanged;
+    public event System.Action<bool> OnGroundedChanged;
+    public event System.Action<float> OnSpeedChanged;
 
     private CharacterState _state;
     private CharacterState _lastState;
@@ -440,6 +443,26 @@ public class PlayerCharacter : MonoBehaviour, ICharacterController
                 _requestedJump = canJumpLater;
             }
         }
+    }
+
+    private void UpdateState(CharacterState newState)
+    {
+        if (_state.Stance != newState.Stance)
+        {
+            OnStanceChanged?.Invoke(newState.Stance);
+        }
+
+        if (_state.Grounded != newState.Grounded)
+        {
+            OnGroundedChanged?.Invoke(newState.Grounded);
+        }
+
+        if (Mathf.Abs(_state.Velocity.magnitude - newState.Velocity.magnitude) > 0.1f)
+        {
+            OnSpeedChanged?.Invoke(newState.Velocity.magnitude);
+        }
+
+        _state = newState;
     }
 
     public Transform GetCameraTarget() => cameraTarget;
