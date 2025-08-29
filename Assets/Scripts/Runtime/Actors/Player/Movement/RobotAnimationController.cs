@@ -41,7 +41,7 @@ public class RobotAnimationController : MonoBehaviour
         animator.SetFloat(_verticalVelocityParam, velocity.y);
 
         // Trigger jump animation when leaving ground with upward velocity
-        if (!state.Grounded && velocity.y > 0)
+        if (playerCharacter.RequestedJump)
         {
             animator.SetTrigger(_jumpParam);
         }

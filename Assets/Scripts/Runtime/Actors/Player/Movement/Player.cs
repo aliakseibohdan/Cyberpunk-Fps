@@ -14,6 +14,7 @@ public class Player : MonoBehaviour
     [SerializeField] private StanceVignette stanceVignette;
 
     private PlayerInput _inputActions;
+    private float _forwardInput;
 
     private void Start()
     {
@@ -41,23 +42,27 @@ public class Player : MonoBehaviour
         var input = _inputActions.Player;
         var deltaTime = Time.deltaTime;
 
-        var cameraInput = new CameraInput { Look = input.Look.ReadValue<Vector2>()  };
+        // Get forward input for camera slide
+        var moveInput = input.Move.ReadValue<Vector2>();
+        _forwardInput = moveInput.y; // Y axis is forward/backward
+
+        var cameraInput = new CameraInput { Look = input.Look.ReadValue<Vector2>() };
         playerCamera.UpdateRotation(cameraInput);
 
         var characterInput = new CharacterInput
         {
-            Rotation    = playerCamera.transform.rotation,
-            Move        = input.Move.ReadValue<Vector2>(),
-            Jump        = input.Jump.WasPressedThisFrame(),
+            Rotation = playerCamera.transform.rotation,
+            Move = moveInput,
+            Jump = input.Jump.WasPressedThisFrame(),
             JumpSustain = input.Jump.IsPressed(),
-            Crouch      = input.Crouch.WasPressedThisFrame()
+            Crouch = input.Crouch.WasPressedThisFrame()
                 ? CrouchInput.Toggle
                 : CrouchInput.None
         };
         playerCharacter.UpdateInput(characterInput);
         playerCharacter.UpdateBody(deltaTime);
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         if (Keyboard.current.tKey.wasPressedThisFrame)
         {
             var ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
@@ -66,7 +71,7 @@ public class Player : MonoBehaviour
                 Teleport(hit.point);
             }
         }
-        #endif
+#endif
     }
 
     private void LateUpdate()
@@ -76,12 +81,15 @@ public class Player : MonoBehaviour
         var state = playerCharacter.GetState();
 
         playerCamera.UpdatePosition(cameraTarget);
-        cameraSpring.UpdateSpring(deltaTime, cameraTarget.up);
+
+        // Pass forward input to the camera spring for slide effect
+        cameraSpring.UpdateSpring(deltaTime, cameraTarget.up, _forwardInput);
+
         cameraLean.UpdateLean
         (
-            deltaTime, 
-            state.Stance is Stance.Slide, 
-            state.Acceleration, 
+            deltaTime,
+            state.Stance is Stance.Slide,
+            state.Acceleration,
             cameraTarget.up
         );
 

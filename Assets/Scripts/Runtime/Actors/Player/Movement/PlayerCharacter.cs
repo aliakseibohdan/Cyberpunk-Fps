@@ -64,10 +64,6 @@ public class PlayerCharacter : MonoBehaviour, ICharacterController
     [Range(0f, 1f)]
     [SerializeField] private float crouchCameraTargetHeight = 0.7f;
 
-    public event System.Action<Stance> OnStanceChanged;
-    public event System.Action<bool> OnGroundedChanged;
-    public event System.Action<float> OnSpeedChanged;
-
     private CharacterState _state;
     private CharacterState _lastState;
     private CharacterState _tempState;
@@ -84,6 +80,8 @@ public class PlayerCharacter : MonoBehaviour, ICharacterController
     private bool _ungroundedDueToJump;
 
     private Collider[] _uncrouchOverlapResults;
+
+    public bool RequestedJump { get => _requestedJump; set => _requestedJump = value; }
 
     public void Initialize()
     {
@@ -138,9 +136,10 @@ public class PlayerCharacter : MonoBehaviour, ICharacterController
         cameraTarget.localPosition = Vector3.Lerp
         (
             a: cameraTarget.localPosition,
-            b: new Vector3(0f, cameraTargetHeight, 0f),
+            b: new Vector3(0f, cameraTargetHeight, 0.3f),
             t: 1f - Mathf.Exp(-crouchHeightResponse * deltaTime)
         );
+
         root.localScale = Vector3.Lerp
         (
             a: root.localScale,
@@ -443,26 +442,6 @@ public class PlayerCharacter : MonoBehaviour, ICharacterController
                 _requestedJump = canJumpLater;
             }
         }
-    }
-
-    private void UpdateState(CharacterState newState)
-    {
-        if (_state.Stance != newState.Stance)
-        {
-            OnStanceChanged?.Invoke(newState.Stance);
-        }
-
-        if (_state.Grounded != newState.Grounded)
-        {
-            OnGroundedChanged?.Invoke(newState.Grounded);
-        }
-
-        if (Mathf.Abs(_state.Velocity.magnitude - newState.Velocity.magnitude) > 0.1f)
-        {
-            OnSpeedChanged?.Invoke(newState.Velocity.magnitude);
-        }
-
-        _state = newState;
     }
 
     public Transform GetCameraTarget() => cameraTarget;
