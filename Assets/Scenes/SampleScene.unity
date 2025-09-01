@@ -348,7 +348,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276125530}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -437,7 +437,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -690,7 +690,7 @@ MonoBehaviour:
   m_ShadowRenderingLayers: 1
   m_LightCookieSize: {x: 1, y: 1}
   m_LightCookieOffset: {x: 0, y: 0}
-  m_SoftShadowQuality: 1
+  m_SoftShadowQuality: 3
 --- !u!1 &528115624
 GameObject:
   m_ObjectHideFlags: 0
@@ -1418,8 +1418,12 @@ PrefabInstance:
     m_TransformParent: {fileID: 176655450}
     m_Modifications:
     - target: {fileID: 342889439657182792, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
-      propertyPath: m_IsActive
+      propertyPath: m_Layer
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 342889439657182792, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 413414837938639183, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
       propertyPath: m_IsActive
@@ -1470,17 +1474,101 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1500340345351501952, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1500340345351501952, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1599851106907392399, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1704880853410985943, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1873328004852889275, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1985245032354003830, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2156426920727553833, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3130376821586607458, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3136993378836703213, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3511475578623435797, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4080473399336914039, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4203253667685166101, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4638274907793512448, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6317703426716355766, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6326228591077283233, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6464579137306032361, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6464579137306032361, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
       propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6638765302953886899, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7200696058122718826, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_CastShadows
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8346160012781675810, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8550671284394041535, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_Layer
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8658632502460512094, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: b48e34bd85be1604997e93c80257e427, type: 2}
+    - target: {fileID: 8658632502460512094, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_AnimatePhysics
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8658632502460512094, guid: 48ec6034c90ec3141a222916c9e762e6, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1517,7 +1605,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCharacter: {fileID: 821220824}
+  playerCamera: {fileID: 276125532}
   animator: {fileID: 1334301055}
+  turnThreshold: 90
+  quickTurnThreshold: 180
+  turnCooldown: 0.5
+  turnCompletionTime: 0.8
+  showDebugInfo: 0
 --- !u!1 &1355669319
 GameObject:
   m_ObjectHideFlags: 0

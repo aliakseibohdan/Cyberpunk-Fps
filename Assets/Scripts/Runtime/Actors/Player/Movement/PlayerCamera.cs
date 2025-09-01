@@ -14,6 +14,8 @@ public class PlayerCamera : MonoBehaviour
     private float _pitch;
     private float _yaw;
 
+    public float Yaw { get => _yaw; set => _yaw = value; }
+
     public void Initialize(Transform target)
     {
         transform.position = target.position;
