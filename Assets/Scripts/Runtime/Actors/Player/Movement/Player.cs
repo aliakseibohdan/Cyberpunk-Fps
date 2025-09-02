@@ -6,6 +6,7 @@ public class Player : MonoBehaviour
 {
     [SerializeField] private PlayerCharacter playerCharacter;
     [SerializeField] private PlayerCamera playerCamera;
+    [SerializeField] private WeaponManager weaponManager;
     [Space]
     [SerializeField] private CameraSpring cameraSpring;
     [SerializeField] private CameraLean cameraLean;
@@ -25,6 +26,7 @@ public class Player : MonoBehaviour
 
         playerCharacter.Initialize();
         playerCamera.Initialize(playerCharacter.GetCameraTarget());
+        weaponManager = GetComponentInChildren<WeaponManager>();
 
         cameraSpring.Initialize();
         cameraLean.Initialize();
@@ -61,6 +63,44 @@ public class Player : MonoBehaviour
         };
         playerCharacter.UpdateInput(characterInput);
         playerCharacter.UpdateBody(deltaTime);
+
+        if (weaponManager != null)
+        {
+            Weapon currentWeapon = weaponManager.GetCurrentWeapon();
+
+            VulcanMinigun minigun = currentWeapon as VulcanMinigun;
+            if (minigun != null)
+            {
+                if (Mouse.current.leftButton.isPressed)
+                {
+                    minigun.StartSpinUp();
+                    weaponManager.Fire();
+                }
+                else if (Mouse.current.leftButton.wasReleasedThisFrame)
+                {
+                    minigun.StartSpinDown();
+
+                    GetComponentInChildren<RobotAnimationController>().OnShootEnd();
+                }
+            }
+            else
+            {
+                if (Mouse.current.leftButton.wasPressedThisFrame)
+                {
+                    weaponManager.Fire();
+                }
+
+                if (Mouse.current.leftButton.wasReleasedThisFrame)
+                {
+                    GetComponentInChildren<RobotAnimationController>().OnShootEnd();
+                }
+            }
+
+            if (Keyboard.current.rKey.wasPressedThisFrame)
+            {
+                weaponManager.TryReload();
+            }
+        }
 
 #if UNITY_EDITOR
         if (Keyboard.current.tKey.wasPressedThisFrame)

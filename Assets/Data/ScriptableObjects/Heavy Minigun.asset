@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81fe788b0c08abd4e981bb57833227b2, type: 3}
+  m_Name: Heavy Minigun
+  m_EditorClassIdentifier: 
+  weaponName: Vulcan Mark III
+  description: Aegis Dynamics' answer to overwhelming force. The Vulcan Mark III
+    features three rotating barrels capable of delivering 2,400 rounds per minute
+    of armor-piercing carnage. Mounts directly to the Ares platform's forearm assembly
+    for maximum stability.
+  weaponID: 0
+  modelPrefab: {fileID: 0}
+  equipPosition: {x: 0, y: 0, z: 0}
+  equipRotation: {x: 0, y: 0, z: 0}
+  ammoType: 0
+  startingAmmo: 100
+  impactEffect: {fileID: 0}
+  damage: 8
+  fireRate: 12
+  maxAmmo: 200
+  reloadTime: 3.5
+  accuracy: 0.7
+  range: 50
+  upgrades:
+  - upgradeName: High-Capacity Ammo Drums
+    upgradeDescription: Increases ammo capacity by 50%
+    damageMultiplier: 0
+    fireRateMultiplier: 0
+    accuracyMultiplier: 0
+    ammoIncrease: 100
+    cost: 500
+  - upgradeName: Reinforced Barrels
+    upgradeDescription: Increases damage by 20% and fire rate by 15%
+    damageMultiplier: 1.2
+    fireRateMultiplier: 1.15
+    accuracyMultiplier: 0
+    ammoIncrease: 0
+    cost: 800
+  - upgradeName: Gyroscopic Stabilizer
+    upgradeDescription: Improves accuracy by 30%
+    damageMultiplier: 0
+    fireRateMultiplier: 0
+    accuracyMultiplier: 1.3
+    ammoIncrease: 0
+    cost: 600
+  unlockedByDefault: 1
