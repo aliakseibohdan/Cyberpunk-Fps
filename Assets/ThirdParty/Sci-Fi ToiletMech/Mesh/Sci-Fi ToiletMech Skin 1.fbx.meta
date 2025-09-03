@@ -1,5 +1,12 @@
 fileFormatVersion: 2
 guid: fc3956512bc7215439fff8c79e83ed8c
+AssetOrigin:
+  serializedVersion: 1
+  productId: 315652
+  packageName: Sci-Fi ToiletMech
+  packageVersion: 1.01
+  assetPath: Assets/Sci-Fi ToiletMech/Mesh/Sci-Fi ToiletMech Skin 1.fbx
+  uploadId: 755620
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -98,7 +105,7 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
-    globalScale: 1
+    globalScale: 0.01
     rootMotionBoneName: 
     hasTranslationDoF: 0
     hasExtraRoot: 0
@@ -115,10 +122,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 315652
-  packageName: Sci-Fi ToiletMech
-  packageVersion: 1.01
-  assetPath: Assets/Sci-Fi ToiletMech/Mesh/Sci-Fi ToiletMech Skin 1.fbx
-  uploadId: 755620
