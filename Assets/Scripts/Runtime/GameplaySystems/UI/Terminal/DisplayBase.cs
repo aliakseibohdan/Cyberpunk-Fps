@@ -29,8 +29,10 @@ public abstract class DisplayBase : MonoBehaviour
     protected void UpdatePosition()
     {
         Vector3 targetPosition = cameraTransform.position +
-                                cameraTransform.forward * distanceFromCamera +
-                                targetOffset;
+                                cameraTransform.forward * distanceFromCamera;
+
+        targetPosition += cameraTransform.right * targetOffset.x;
+        targetPosition += cameraTransform.up * targetOffset.y;
 
         transform.SetPositionAndRotation(Vector3.Lerp(
             transform.position,
