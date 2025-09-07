@@ -7,11 +7,10 @@ using UnityEngine.UI;
 public class TerminalDisplay : DisplayBase
 {
     [SerializeField] private TMP_Text textDisplay;
-    [SerializeField] private Image progressBar;
     [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip[] typingClips;
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private int maxLines = 10;
-
     private List<TerminalLine> lines = new();
     private float typingSpeed = 0.05f;
     private Coroutine typingCoroutine;
@@ -61,12 +60,8 @@ public class TerminalDisplay : DisplayBase
 
                 UpdateTextDisplay(currentText);
 
-                audioSource.PlayOneShot(Resources.Load<AudioClip>("TypeSound"));
-
-                if (progressBar != null)
-                {
-                    progressBar.fillAmount = (float)i / line.Text.Length;
-                }
+                var soundIndex = Random.Range(0, typingClips.Length);
+                audioSource.PlayOneShot(typingClips[soundIndex]);
 
                 yield return new WaitForSeconds(typingSpeed);
             }

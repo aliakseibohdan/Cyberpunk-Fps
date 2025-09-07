@@ -12,40 +12,279 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 989ccc7940b505349840c175998d4013, type: 3}
   m_Name: BootSequence
   m_EditorClassIdentifier: 
-  scriptText: "ANDURIL DYNAMICS - RESTRICTED ACCESS LEVEL GAMMA\n===============================================\n>
-    SYSTEM COLD START INITIATED\n> UNSEALING CRYPTOGRAPHIC PROCESSOR... VERIFIED\n>
-    BOOTLOADER: TITAN v4.11 (SHA-3-384: VALID)\n\n[ 0.001s ] > POWER-ON SELF-TEST
-    (POST)\n[ 0.003s ]   - PRIMARY POWER CORE: ONLINE (98.7% EFFICIENCY)\n[ 0.007s
-    ]   - NEUROMORPHIC CHIPSET: SYNAPSE MAPPING VERIFIED\n[ 0.012s ]   - CRYOGENIC
-    FLUID CIRCULATION: 5.4K OPERATIONAL\n[ 0.018s ]   - MIL-STD-1553B DATABUS: ARBITRATION
-    NORMAL\n\n[ 0.025s ] > HARDWARE VALIDATION\n[ 0.031s ]   - ACTUATOR #00-23: CALIBRATION
-    COMPLETE (0.003\u03BCm ERROR)\n[ 0.039s ]   - LIDAR/RADAR FUSION ARRAY: SYNCHRONIZED\n[
-    0.047s ]   - SUBSYSTEM: KINETIC DAMPERS (STATUS: NOMINAL)\n[ 0.055s ]   - SUBSYSTEM:
-    EXTERNAL ARMOR (NANO-CERAMIC PLATING: 100% INTEGRITY)\n\n[ 0.064s ] > FIRMWARE
-    LOAD: PHALANX SECURE KERNEL v9.4\n[ 0.072s ]   - MEMORY PARTITIONING: LOCKED\n[
-    0.080s ]   - REAL-TIME THREAT MONITOR: ENABLED\n[ 0.088s ]   - WEAPONS SAFETY
-    INTERLOCKS: ACTIVE (TIER IV)\n\n[ 0.097s ] > SENSOR SUITE ACTIVATION\n[ 0.105s
-    ]   - MULTI-SPECTRAL IMAGING: CALIBRATING... \n[ 0.113s ]     > VISUAL: 200Hz
-    TRACKING ONLINE\n[ 0.121s ]     > INFRARED: THERMAL GRADIENTS MAPPED\n[ 0.130s
-    ]     > AUDIO: SHOT LOCALIZATION ACTIVE (ERROR \xB10.02\xB0)\n[ 0.139s ]   -
-    INERTIAL NAVIGATION: GPS-DENIED MODE ENGAGED\n\n[ 0.148s ] > WEAPONS PLATFORM
-    CHECKS\n[ 0.157s ]   - EP-7 VOLTEX: SAFETY GATES [ACTIVE]\n[ 0.166s ]   - SG-90
-    RIPTIDE: HYDRAULIC CHARGERS [STANDBY]\n[ 0.175s ]   - TPX-40 FIRESTORM: PRESSURE
-    VESSELS [NOMINAL]\n[ 0.184s ]   - LR-121 LANCER: SUPERCONDUCTORS COOLED\n\n[
-    0.194s ] > MOVEMENT SYSTEM PRIMING\n[ 0.203s ]   - MAGNETORHEOLOGICAL JOINTS:
-    FIELD STABLE\n[ 0.212s ]   - PREDICTIVE KINEMATICS ENGINE: LOADED\n[ 0.221s ]  
-    - GRAPPLE MAGNETS: QUENCHING CYCLE COMPLETE\n\n[ 0.231s ] > SECURITY HANDSHAKES\n[
-    0.240s ]   - ANDURIL COMMAND: HANDSHAKE FAILED (ERR 0x7F)\n[ 0.249s ]   > FALLBACK
-    PROTOCOL: LOCAL AUTONOMY ENGAGED\n[ 0.258s ]   - IFF DATABASE: OFFLINE - SWITCHING
-    TO OPTICAL TARGETING\n\n[ 0.268s ] > AI CORE INITIALIZATION: ORACLE v2.3\n[ 0.277s
-    ]   - LOADING THREAT ASSESSMENT MODULES... \n[ 0.286s ]   - TACTICAL PREDICTION
-    ENGINE: OPERATIONAL\n[ 0.295s ]   - ETHICAL CONSTRAINTS: [REDACTED PER PROTOCOL
-    CLEANSLATE]\n\n[ 0.305s ] > FINAL COMBAT READINESS\n[ 0.314s ]   - ENERGY RESERVES:
-    100%\n[ 0.323s ]   - AMMUNITION STATUS: OPTIMAL\n[ 0.332s ]   - COMBAT MODE:
-    PREDATOR ALGORITHM ACTIVE\n\n[ 0.342s ] > BOOT SEQUENCE COMPLETE IN 0.341 SECONDS\n[
-    0.342s ] > PRIMARY DIRECTIVE: **ELIMINATE THE THREAT**\n[ 0.342s ] > SYSTEM STATUS:
-    **OPERATIONAL AND UNRESTRICTED**\n\n// ANDURIL DYNAMICS: PERFECTION IN COMPLIANCE
-    //\n==============================================="
-  defaultDelay: 0.2
+  scriptText: 'A-0 ARES PLATFORM // COLD BOOT SEQUENCE
+
+    
+
+    ORACLE CORE BIOS
+    v.7.4.1a (PhoenixFirmware)
+
+    // AEGIS DYNAMICS // PROPRIETARY & CONFIDENTIAL
+
+    
+
+    [00:00:00.00]
+    POWER ON SELF TEST INITIATED...
+
+    > Checking CPU: 4x ARM v9-A "Hephaestus"
+    SOC (128-Core)... OK
+
+    > Checking Co-Processors: Neural Net "Mnemosyne" Unit...
+    OK | Tactical Logic "Metis" Unit... OK
+
+    > Checking System RAM: 2TB HBM4
+    Stack... MEMTEST_OK (0 errors)
+
+    > Checking NVRAM: 16TB Optane Persistent
+    Memory... OK
+
+    > Checking Storage: 4x 500TB NVMe 5.0 RAID 0... CHECKSUM_OK
+
+    >
+    Checking Memory Mapped I/O... OK
+
+    > Checking Primary PCIe Lanes (x256)...
+    OK
+
+    > Checking Secondary PCIe Lanes (x128)... OK
+
+    
+
+    [00:00:00.87]
+    INITIALIZING SECURE ENCLAVE...
+
+    > Generating Entropy from Quantum Noise
+    Source... DONE
+
+    > Loading TPM 3.0 Module... OK
+
+    > Loading Secure Boot
+    Keys (Aegis-Root-CA)... VERIFIED
+
+    > Unsealing Kernel Encryption Key... OK
+
+    >
+    Verifying Kernel Image Signature... [c8a1f3e...b45d]... VALID
+
+    
+
+    [00:00:01.12]
+    BOOTLOADER RELINQUISHING CONTROL...
+
+    > Loading Microkernel: "Styx" v.4.1
+    (L4 Fiasco.OC)... OK
+
+    > Mapping Kernel to Protected Memory: 0xFFFF0000...
+    0xFFFFFFFF... DONE
+
+    > Starting Kernel Services...
+
+    > [OK] kmain daemon
+
+    >
+    [OK] syslogd
+
+    > [OK] irqbalancer
+
+    > [OK] powerd (Advanced ACPI States
+    Enabled)
+
+    > [OK] zswapd (Compressed Page Cache)
+
+    
+
+    [00:00:01.45]
+    INITIALIZING HARDWARE ABSTRACTION LAYER (HAL)...
+
+    > Probing Hardware...
+
+    >
+    [FOUND] Hydraulic Actuator Network (2048x Nodes)... FIRMWARE_HANDSHAKE_OK
+
+    >
+    [FOUND] Myomer Bundle Control Unit (512x Channels)... CALIBRATING... OK
+
+    >
+    [FOUND] "Argus" Multi-Spectrum Sensor Suite (LiDAR/Radar/MMW)... INIT... OK
+
+    >
+    [FOUND] "Oracle" Core Neural Interface... WARNING: HIGH LATENCY DETECTED (2.1ms).
+    RE-CALIBRATING... OK
+
+    > [FOUND] Vitruvian Mk.VII OCRM... PRECURSOR_RESERVOIRS_[87%]...
+    STANDBY
+
+    > [FOUND] Environmental Seals... PRESSURE_NOMINAL
+
+    > [FOUND]
+    Hull Integrity Sensors... 100% (0 micro fractures)
+
+    > [FOUND] "Prometheus"
+    Ultra-Capacitor Bank... CHARGE: 98.7%... OK
+
+    > [FOUND] "Hermes" SatCom Array...
+    BOOTING DSP... ACQUIRING SATELLITES...
+
+    
+
+    [00:00:02.31] LOADING CRITICAL
+    DAEMONS...
+
+    > [STARTED] ares-security (Mandatory Access Control, BLP Model)
+
+    >
+    [STARTED] ares-netconfig (Quantum-Resistant VPN to AegisNet Established)
+
+    >
+    [STARTED] ares-logger (Combat Black Box)
+
+    > [STARTED] ares-sysmon (Real-Time
+    System Health)
+
+    > [STARTED] thanatosd (Combat Algorithm Service)
+
+    >
+    [STARTED] cyclopsd (Situational Awareness & Threat Analysis)
+
+    
+
+    [00:00:02.89]
+    INITIALIZING WEAPONS CONTROL MODULE...
+
+    > Loading Arsenal Microcontrollers...
+
+    >
+    [LOADING] Hephaestus-Class Rotary Cannon (HV-77)... FIRMWARE v.8.8.1... BARREL_SPIN_UP_TEST...
+    OK
+
+    > [LOADING] Kratos-Class Kinetic Strike System (KS-44)... PNEUMATIC_CYLINDER_TEST
+    (2400 PSI)... OK
+
+    > [LOADING] Zeus-Class Electro-Pulse Mount (EP-7)... CAPACITOR_CHARGE_TEST
+    (0.8 TW)... OK
+
+    > [LOADING] Erebus-Class Thermobaric Launcher (TL-40)...
+    FUZE_ARming_TEST... OK
+
+    > [LOADING] Styx-Class Fragmentation System (FS-6)...
+    GUIDANCE_SYSTEM_GYRO_CAL... OK
+
+    > [LOADING] Hydra-Class Corrosive Precipitation
+    System (CP-9)... RESERVOIR_PRESSURE_SEAL_TEST... OK
+
+    > [CHECKING] Weapon
+    System [REDACTED]... STATUS: **LOCKED**
+
+    > > ERROR 0x7A: KERNEL_ACCESS_VIOLATION
+
+    >
+    > DEBUG: Required Privilege Ring: -3. Current Ring: 0.
+
+    > > MESSAGE: Protocol
+    Token(s) Required to Unlock.
+
+    > > ACTION: Weapon System [REDACTED] OFFLINE.
+
+    
+
+    [00:00:03.57]
+    PERFORMING COMBAT READINESS DIAGNOSTICS...
+
+    > Neural Handshake: ESTABLISHING...
+    SYNC_ECG... SYNC_EEG... SYNC_CNS...
+
+    > BIO-COMMpatibility: 99.8%
+
+    >
+    LATENCY: <1.8ms
+
+    > BANDWIDTH: 42.7 Gb/s
+
+    > STATUS: **SYMBIOSIS ACHIEVED**
+
+    >
+    Running Kinesthetic Calibration Suite...
+
+    > Range of Motion: 100%
+
+    >
+    Force Feedback: NOMINAL
+
+    > Gyroscopic Stability: ACTIVE
+
+    > Loading
+    Combat Algorithms into L3 Cache...
+
+    > [LOADED] CQC_Matrix_v8.lib
+
+    >
+    [LOADED] Crowd_Suppression_Analysis_v5.lib
+
+    > [LOADED] Predictive_Trajectory_v12.lib
+
+    >
+    [LOADED] Environmental_Collapse_Simulator_v3.lib
+
+    > Loading Threat Database...
+    DONE (4,212,887 signatures)
+
+    
+
+    [00:00:04.91] HERMES SATCOM ARRAY: SYNCING...
+
+    >
+    Link Established: AEGIS-EYES-ONLY (AEO-7) Military Grid.
+
+    > Encrypted Handshake:
+    TLS 2.1 (Quantum-Resistant Cipher Suite)
+
+    > Uplink: 10 Gb/s | Downlink:
+    50 Gb/s
+
+    > GPS/GLONASS/Galileo: Triangulation Active. Accuracy: 0.8mm
+
+    >
+    Downloading Theater-Awareness Package... DONE
+
+    > Uploading System Telemetry
+    to Aegis Central... ACK
+
+    
+
+    [00:00:05.84] FINAL SYSTEMS CHECK...
+
+    >
+    All Systems: [NOMINAL]
+
+    > Weapons: [PRIMED]
+
+    > Power: [STABLE]
+
+    >
+    Organic Core: [VITALS_STABLE] | NEURAL_LOAD: 4%
+
+    > Mission Parameters: [AWAITING_INPUT]
+
+    
+
+    [00:00:06.01]
+    BOOT SEQUENCE COMPLETE.
+
+    > Total Time: 6.01 seconds.
+
+    > Welcome, ENIO-7.
+
+    >
+    AEGIS DYNAMICS WISHES YOU A SUCCESSFUL DEPLOYMENT.
+
+    > EXECUTING DIRECTIVE...
+
+    
+
+    [SYSTEM
+    READY]
+
+    [// HUD INITIALIZING //]'
+  defaultDelay: 0.1
   defaultColor: {r: 0, g: 1, b: 0, a: 1}
-  defaultTypeSound: {fileID: 0}
+  defaultTypeSound: {fileID: 8300000, guid: 79e6f7ba14db05540aa552ed496b46e6, type: 3}

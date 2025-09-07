@@ -17,7 +17,7 @@ public class CharacterCallManager : MonoBehaviour
     [SerializeField] private CharacterCall[] availableCalls;
 
     private readonly Dictionary<string, CharacterCall> callDictionary = new();
-    private DialogueDisplay? currentCallDisplay;
+    private DialogueDisplay currentCallDisplay;
 
     private void Start()
     {

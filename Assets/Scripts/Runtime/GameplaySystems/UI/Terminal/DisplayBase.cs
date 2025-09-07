@@ -16,31 +16,31 @@ public abstract class DisplayBase : MonoBehaviour
         this.targetOffset = worldOffset;
         isActive = true;
 
-        UpdatePosition();
+        //UpdatePosition();
     }
 
     protected virtual void Update()
     {
-        if (!isActive || cameraTransform == null) return;
+        //if (!isActive || cameraTransform == null) return;
 
-        UpdatePosition();
+        //UpdatePosition();
     }
 
     protected void UpdatePosition()
     {
-        Vector3 targetPosition = cameraTransform.position +
-                                cameraTransform.forward * distanceFromCamera;
+        //Vector3 targetPosition = cameraTransform.position +
+        //                        cameraTransform.forward * distanceFromCamera;
 
-        targetPosition += cameraTransform.right * targetOffset.x;
-        targetPosition += cameraTransform.up * targetOffset.y;
+        //targetPosition += cameraTransform.right * targetOffset.x;
+        //targetPosition += cameraTransform.up * targetOffset.y;
 
-        transform.SetPositionAndRotation(Vector3.Lerp(
-            transform.position,
-            targetPosition,
-            smoothFollowSpeed * Time.deltaTime
-        ), Quaternion.LookRotation(
-            transform.position - cameraTransform.position
-        ));
+        //transform.SetPositionAndRotation(Vector3.Lerp(
+        //    transform.position,
+        //    targetPosition,
+        //    smoothFollowSpeed * Time.deltaTime
+        //), Quaternion.LookRotation(
+        //    transform.position - cameraTransform.position
+        //));
     }
 
     public abstract void Show();

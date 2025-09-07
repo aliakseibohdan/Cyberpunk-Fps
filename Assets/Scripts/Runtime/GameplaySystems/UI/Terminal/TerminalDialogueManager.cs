@@ -6,6 +6,7 @@ using UnityEngine;
 public class TerminalDialogueManager : MonoBehaviour
 {
     [SerializeField] private Canvas worldCanvas;
+    [SerializeField] private Transform canvasCamera;
     [SerializeField] private GameObject terminalDisplayPrefab;
     [SerializeField] private GameObject dialogueDisplayPrefab;
     [SerializeField] private GameObject animatedSpritePrefab;
@@ -15,12 +16,9 @@ public class TerminalDialogueManager : MonoBehaviour
     [SerializeField] private Color defaultTerminalColor = Color.green;
 
     private readonly List<DisplayBase> activeDisplays = new();
-    private Transform mainCamera;
 
     private void Start()
     {
-        mainCamera = Camera.main != null ? Camera.main.transform : null;
-
         if (worldCanvas == null)
         {
             worldCanvas = FindAnyObjectByType<Canvas>();
@@ -37,10 +35,10 @@ public class TerminalDialogueManager : MonoBehaviour
         float? typingSpeed = null,
         Color? defaultColor = null)
     {
-        if (mainCamera == null || worldCanvas == null)
+        if (canvasCamera == null || worldCanvas == null)
             throw new InvalidOperationException("Manager not properly initialized");
 
-        Vector3 startPosition = mainCamera.position + mainCamera.forward * 2f;
+        Vector3 startPosition = canvasCamera.position + canvasCamera.forward;
         var displayObj = Instantiate(terminalDisplayPrefab, startPosition, Quaternion.identity, worldCanvas.transform);
         var terminalDisplay = displayObj.GetComponent<TerminalDisplay>();
 
@@ -50,7 +48,7 @@ public class TerminalDialogueManager : MonoBehaviour
             defaultColor ?? defaultTerminalColor
         );
 
-        terminalDisplay.Initialize(mainCamera, worldOffset);
+        terminalDisplay.Initialize(canvasCamera, worldOffset);
         activeDisplays.Add(terminalDisplay);
         terminalDisplay.Show();
 
@@ -85,17 +83,18 @@ public class TerminalDialogueManager : MonoBehaviour
 
     public DialogueDisplay CreateDialogueDisplay(
         List<DialogueLine> lines,
-        Vector3 worldPosition,
+        Vector3 worldOffset,
         float? typingSpeed = null)
     {
-        if (mainCamera == null || worldCanvas == null)
+        if (canvasCamera == null || worldCanvas == null)
             throw new InvalidOperationException("Manager not properly initialized");
 
-        var displayObj = Instantiate(dialogueDisplayPrefab, worldPosition, Quaternion.identity, worldCanvas.transform);
+        Vector3 startPosition = canvasCamera.position + canvasCamera.forward;
+        var displayObj = Instantiate(dialogueDisplayPrefab, startPosition + worldOffset, Quaternion.identity, worldCanvas.transform);
         var dialogueDisplay = displayObj.GetComponent<DialogueDisplay>();
 
         dialogueDisplay.Configure(lines, typingSpeed ?? defaultTypingSpeed);
-        dialogueDisplay.Initialize(mainCamera, worldPosition);
+        dialogueDisplay.Initialize(canvasCamera, worldOffset);
         activeDisplays.Add(dialogueDisplay);
         dialogueDisplay.Show();
 
@@ -106,14 +105,14 @@ public class TerminalDialogueManager : MonoBehaviour
         SpriteAnimation animation,
         Vector3 worldPosition)
     {
-        if (mainCamera == null || worldCanvas == null)
+        if (canvasCamera == null || worldCanvas == null)
             throw new InvalidOperationException("Manager not properly initialized");
 
         var displayObj = Instantiate(animatedSpritePrefab, worldPosition, Quaternion.identity, worldCanvas.transform);
         var spriteDisplay = displayObj.GetComponent<AnimatedSpriteDisplay>();
 
         spriteDisplay.Configure(animation);
-        spriteDisplay.Initialize(mainCamera, worldPosition);
+        spriteDisplay.Initialize(canvasCamera, worldPosition);
         activeDisplays.Add(spriteDisplay);
         spriteDisplay.Show();
 

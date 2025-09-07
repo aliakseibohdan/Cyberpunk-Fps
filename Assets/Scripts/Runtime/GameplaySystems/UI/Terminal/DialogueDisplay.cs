@@ -116,14 +116,7 @@ public class DialogueDisplay : DisplayBase
 
     private IEnumerator TypeDialogueRoutine()
     {
-        int startIndex = dialogueLines.Count > 0 ? 1 : 0;
-
-        if (startIndex == 0)
-        {
-            yield break;
-        }
-
-        for (int lineIndex = startIndex; lineIndex < dialogueLines.Count; lineIndex++)
+        for (int lineIndex = 0; lineIndex < dialogueLines.Count; lineIndex++)
         {
             var line = dialogueLines[lineIndex];
 
