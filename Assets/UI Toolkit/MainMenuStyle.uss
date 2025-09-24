@@ -27,3 +27,23 @@
 .button:hover {
     translate: 10px 0;
 }
+
+.optionButton {
+    -unity-font-definition: url("project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&guid=349cde46e80fda1479c891b2cd0270ac&type=3#NotInter-Regular");
+    color: rgb(174, 255, 245);
+    -unity-font-style: normal;
+    background-color: rgba(0, 0, 0, 0);
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    transition-duration: 0.3s;
+}
+
+.optionButton:hover {
+    color: rgb(255, 174, 184);
+    scale: 1.1 1.1;
+}
+
+.menu-container {
+}

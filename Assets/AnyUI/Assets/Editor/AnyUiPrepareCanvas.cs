@@ -35,24 +35,29 @@ public class AnyUiPrepareCanvas : EditorWindow
         {
 
             var anyUiMeshGO = (GameObject)anyuimeshobject;
+            
             if (anyUiMeshGO.GetComponent<AnyUiMesh>() == null)
                 mesh = anyUiMeshGO.AddComponent<AnyUiMesh>();
+
             mesh = anyUiMeshGO.GetComponent<AnyUiMesh>();
         }
         var rect = EditorGUILayout.BeginHorizontal("Button");
         if (GUI.Button(rect, GUIContent.none))
         {
             if(mesh != null && mesh.CanvasToProject == null)
-                createAnyUiCanvasFor(mesh);
+                CreateAnyUiCanvasFor(mesh);
         }
         GUILayout.Label("Ok");
         EditorGUILayout.EndHorizontal();
     }
 
-    private void createAnyUiCanvasFor(AnyUiMesh mesh)
+    private void CreateAnyUiCanvasFor(AnyUiMesh mesh)
     {
-        GameObject canvasGameObject = new GameObject();
-        if(placeTestCheckerboard)CreateCheckerboardTexture(canvasGameObject);
+        GameObject canvasGameObject = new();
+
+        if (placeTestCheckerboard)
+            CreateCheckerboardTexture(canvasGameObject);
+
         canvasGameObject.transform.parent = mesh.transform.parent;     
         canvasGameObject.name = "AnyUiCanvasFor" + mesh.gameObject.name;
         canvasGameObject.layer = 5; //ui layer
@@ -66,11 +71,13 @@ public class AnyUiPrepareCanvas : EditorWindow
         //try to determine the size and adapt created canvas size
         var col = mesh.GetComponent<Collider>();
         bool artificiallyCreatedCollider = false;
+
         if (col == null)
         {
             artificiallyCreatedCollider = true;
             col = mesh.gameObject.AddComponent<BoxCollider>();
         }
+
         float diagonalLength = Vector3.Distance( col.bounds.max , col.bounds.min);
         canvasRectTransform.localScale = Vector3.one * (diagonalLength / (float)canvasEdgeLength);
         canvasRectTransform.sizeDelta = new Vector2(canvasEdgeLength, canvasEdgeLength);
@@ -79,33 +86,35 @@ public class AnyUiPrepareCanvas : EditorWindow
         //place canvas next to object on the world y axis and let it look into negative z
         canvasRectTransform.position = col.bounds.center + new Vector3(0,  diagonalLength, 0);
         canvasRectTransform.transform.forward = -Vector3.forward;
+
         if (artificiallyCreatedCollider)
             DestroyImmediate(col);
-        
 
         //add event system if needed
-        if (FindObjectOfType<EventSystem>() == null)
+        if (FindFirstObjectByType<EventSystem>() == null)
         {
-            GameObject eventSystem = new GameObject();
-            eventSystem.name = "EventSystem";
+            GameObject eventSystem = new()
+            {
+                name = "EventSystem"
+            };
             eventSystem.AddComponent<EventSystem>();
             eventSystem.AddComponent<StandaloneInputModule>();
             Debug.Log("Setup AnyUi Canvas: created an EventSystem because there wasn't one in this scene yet");
         }
-
-       
-
     }
     
     private void CreateCheckerboardTexture(GameObject _canvasRoot)
     {
         // creates a checkerboard test image
-        GameObject checkerBoardTexture = new GameObject();
-        checkerBoardTexture.name = "testTexture";
+        GameObject checkerBoardTexture = new()
+        {
+            name = "testTexture"
+        };
         checkerBoardTexture.transform.parent = _canvasRoot.transform;
         checkerBoardTexture.AddComponent<Image>();
 
         if (!Resources.Load<Sprite>("TestCheckerboard")) return;
+
         Image _checkerBoardImage = checkerBoardTexture.GetComponent<Image>();
         _checkerBoardImage.sprite = Resources.Load<Sprite>("TestCheckerboard");
         _checkerBoardImage.SetNativeSize();

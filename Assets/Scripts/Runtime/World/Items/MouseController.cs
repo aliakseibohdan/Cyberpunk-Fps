@@ -7,6 +7,10 @@ public class MouseController : MonoBehaviour
     [SerializeField] private float easingFactor = 0.1f;
     [SerializeField] private float maxRadius = 3f;
 
+    [Header("Rotation Settings")]
+    [SerializeField] private float maxRotationAngle = 15f;
+    [SerializeField] private float rotationSmoothing = 0.1f;
+
     [Header("Reference Points")]
     [SerializeField] private Transform centerPoint;
 
@@ -14,6 +18,8 @@ public class MouseController : MonoBehaviour
     private Vector3 initialPosition;
     private Vector2 mouseStartPosition;
     private bool isInitialized = false;
+    private Quaternion targetRotation;
+    private Quaternion initialRotation;
 
     void Start()
     {
@@ -24,6 +30,7 @@ public class MouseController : MonoBehaviour
     {
         HandleMouseInput();
         ApplySmoothMovement();
+        ApplyRotation();
         ApplyRadiusConstraint();
     }
 
@@ -31,6 +38,8 @@ public class MouseController : MonoBehaviour
     {
         initialPosition = transform.position;
         targetPosition = initialPosition;
+        initialRotation = transform.rotation;
+        targetRotation = initialRotation;
 
         mouseStartPosition = new Vector2(Screen.width / 2f, Screen.height / 2f);
 
@@ -52,11 +61,21 @@ public class MouseController : MonoBehaviour
 
         Vector3 center = centerPoint != null ? centerPoint.position : initialPosition;
         targetPosition = center + new Vector3(normalizedDelta.y, 0f, -normalizedDelta.x) * movementSpeed;
+
+        float rotationAmount = Mathf.Clamp(mouseDelta.x / Screen.width * 2f, -1f, 1f) * maxRotationAngle;
+        targetRotation = Quaternion.Euler(initialRotation.eulerAngles.x,
+                                         initialRotation.eulerAngles.y + rotationAmount,
+                                         initialRotation.eulerAngles.z);
     }
 
     private void ApplySmoothMovement()
     {
         transform.position = Vector3.Lerp(transform.position, targetPosition, easingFactor);
+    }
+
+    private void ApplyRotation()
+    {
+        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSmoothing);
     }
 
     private void ApplyRadiusConstraint()
@@ -87,10 +106,17 @@ public class MouseController : MonoBehaviour
         easingFactor = Mathf.Clamp(newEasing, 0.01f, 1f);
     }
 
+    public void SetMaxRotationAngle(float newAngle)
+    {
+        maxRotationAngle = Mathf.Clamp(newAngle, 0f, 90f);
+    }
+
     public void ResetPosition()
     {
         transform.position = initialPosition;
         targetPosition = initialPosition;
+        transform.rotation = initialRotation;
+        targetRotation = initialRotation;
 
         mouseStartPosition = Input.mousePosition;
     }
@@ -110,6 +136,10 @@ public class MouseController : MonoBehaviour
 
             Gizmos.color = Color.red;
             Gizmos.DrawLine(center, transform.position);
+
+            Gizmos.color = Color.blue;
+            Vector3 direction = transform.TransformDirection(Vector3.forward) * 0.5f;
+            Gizmos.DrawRay(transform.position, direction);
         }
     }
 }
