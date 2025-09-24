@@ -101,8 +101,11 @@ public class MainMenuEvents : MonoBehaviour
         _buttons[MenuButton.NewGame] = _document.rootVisualElement.Q<Button>("NewGameButton");
         _buttons[MenuButton.ContinueGame] = _document.rootVisualElement.Q<Button>("ContinueGameButton");
         _buttons[MenuButton.Settings] = _document.rootVisualElement.Q<Button>("SettingsButton");
-        _buttons[MenuButton.Settings] = _document.rootVisualElement.Q<Button>("CreditsButton");
+        _buttons[MenuButton.Credits] = _document.rootVisualElement.Q<Button>("CreditsButton");
         _buttons[MenuButton.Exit] = _document.rootVisualElement.Q<Button>("ExitButton");
+        _buttons[MenuButton.Back] = _document.rootVisualElement.Q<Button>("BackButton");
+
+        if (string.IsNullOrEmpty(_sceneToLoadFromContinueGame.SceneName)) _buttons[MenuButton.ContinueGame].SetEnabled(false);
     }
 
     private void CacheSettingsElements()
@@ -273,8 +276,8 @@ public class MainMenuEvents : MonoBehaviour
                 {
                     case MenuButton.Consent:
 
-                        ShowContainer("MainMenuContainer", true, true, .35f);
                         ShowContainer("DisclaimerContainer", false, true, .35f);
+                        ShowContainer("MainMenuContainer", true, true, 1f);
                         break;
 
                     case MenuButton.NewGame:
@@ -291,16 +294,20 @@ public class MainMenuEvents : MonoBehaviour
 
                     case MenuButton.Settings:
 
-                        //StartCoroutine(FadeElement(_buttons[MenuButton.Back], true));
                         ShowContainer("SettingsContainer", true, true, .35f);
                         ShowContainer("MainMenuContainer", false, true, .35f);
                         break;
 
                     case MenuButton.Credits:
 
-                        //StartCoroutine(FadeElement(_buttons[MenuButton.Back], true));
-                        ShowContainer("CreditsContainer", true, true, .35f);
                         ShowContainer("MainMenuContainer", false, true, .35f);
+                        ShowContainer("CreditsContainer", true, true, 1f);
+                        break;
+
+                    case MenuButton.Back:
+
+                        ShowContainer("CreditsContainer", false, true, .35f);
+                        ShowContainer("MainMenuContainer", true, true, 1f);
                         break;
 
                     case MenuButton.Exit:
