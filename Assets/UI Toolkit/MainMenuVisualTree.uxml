@@ -1,0 +1,11 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/MainMenuStyle.uss?fileID=7433441132597879392&amp;guid=bdb23c2899186754686ca49385542ed3&amp;type=3#MainMenuStyle" />
+    <engine:VisualElement name="Container" style="flex-grow: 1;">
+        <engine:Label text="CHROME &#10;FLESH" name="Title" class="header" />
+        <engine:Button text="New Deployment" name="StartGameButton" class="button" style="top: 40px; -unity-background-image-tint-color: rgb(255, 255, 255); background-color: rgba(0, 0, 0, 0); display: flex;" />
+        <engine:Button text="Reinstate Session" name="ResumeGameButton" class="button" style="top: 40px;" />
+        <engine:Button text="System Calibration" name="SettingsButton" class="button" style="top: 40px; left: -80px;" />
+        <engine:Button text="Personnel Records" name="CreditsButton" class="button" style="top: 40px; left: -80px;" />
+        <engine:Button text="Sever Link" name="ExitButton" class="button" style="top: 40px;" />
+    </engine:VisualElement>
+</engine:UXML>

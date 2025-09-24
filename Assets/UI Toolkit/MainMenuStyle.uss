@@ -1,0 +1,29 @@
+.header {
+    font-size: 20px;
+    -unity-font-definition: url("project://database/Assets/AnyUI/Demo/Terrain/Assets/Scifi%20Adventure.otf?fileID=12800000&guid=e9b5dfc72458172429deede049981e5b&type=3#Scifi Adventure");
+    -unity-text-align: upper-center;
+    color: rgb(174, 255, 245);
+    top: 20px;
+}
+
+.button {
+    -unity-font-definition: url("project://database/Assets/Art/UI/Fonts/uni-sans/Uni%20Sans%20Heavy.otf?fileID=12800000&guid=9e78360efe2840a4aa74c136fa66588b&type=3#Uni Sans Heavy");
+    font-size: 20px;
+    color: rgb(174, 255, 205);
+    background-color: rgba(0, 0, 0, 0);
+    width: 300px;
+    height: 30px;
+    -unity-text-align: middle-left;
+    border-left-color: rgba(0, 0, 0, 0);
+    border-right-color: rgba(0, 0, 0, 0);
+    border-top-color: rgba(0, 0, 0, 0);
+    border-bottom-color: rgba(0, 0, 0, 0);
+    align-self: center;
+    padding-top: 20px;
+    left: -80px;
+    transition-duration: 0.2s;
+}
+
+.button:hover {
+    translate: 10px 0;
+}
