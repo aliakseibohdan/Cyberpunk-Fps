@@ -669,8 +669,8 @@ MonoBehaviour:
   _fadeDuration: 0.5
   _audioMixer: {fileID: 24100000, guid: a98f780d4c26ede468b03104f192ab14, type: 2}
   _sceneToLoadFromNewGame:
-    _sceneAsset: {fileID: 102900000, guid: 99c9720ab356a0642a771bea13969a05, type: 3}
-    _sceneName: SampleScene
+    _sceneAsset: {fileID: 102900000, guid: 67d7aa9f78bcbe54c8bcf82ff339579e, type: 3}
+    _sceneName: LVL2_DeltaMetropolis
   _sceneToLoadFromContinueGame:
     _sceneAsset: {fileID: 0}
     _sceneName: 
