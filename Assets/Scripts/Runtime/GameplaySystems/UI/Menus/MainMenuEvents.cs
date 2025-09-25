@@ -25,22 +25,30 @@ public class MainMenuEvents : MonoBehaviour
     // Main menu buttons
     private readonly Dictionary<MenuButton, Button> _buttons = new();
 
-    // Settings UI elements
-    private DropdownField _qualityDropdown;
-    private DropdownField _resolutionDropdown;
-    private Toggle _fullscreenToggle;
-    private Toggle _borderlessToggle;
+    // Settings UI elements - Replaced dropdowns with arrow navigation
+    private SettingControl _qualitySetting;
+    private SettingControl _resolutionSetting;
+    private SettingControl _fullscreenModeSetting;
+
     private Slider _masterVolumeSlider;
     private Slider _musicVolumeSlider;
     private Slider _sfxVolumeSlider;
     private Slider _uiVolumeSlider;
-    private Slider _ambienceVolumeSlider;
-    private Slider _dialogueVolumeSlider;
     private Button _settingsBackButton;
 
     // Resolution data
     private Resolution[] _availableResolutions;
+    private List<Resolution> _uniqueResolutions;
     private int _currentResolutionIndex;
+
+    // Fullscreen mode options
+    private readonly List<string> _fullscreenModes = new()
+    {
+        "Fullscreen Window",
+        "Exclusive Fullscreen",
+        "Maximized Window",
+        "Windowed"
+    };
 
     private enum MenuButton
     {
@@ -50,7 +58,30 @@ public class MainMenuEvents : MonoBehaviour
         Settings,
         Credits,
         Exit,
-        Back
+        CreditsBack,
+        SettingsBack
+    }
+
+    // Class to handle the new arrow-button navigation system
+    private class SettingControl
+    {
+        public Button LeftButton { get; set; }
+        public Button RightButton { get; set; }
+        public Label ValueLabel { get; set; }
+        public List<string> Options { get; set; }
+        public int CurrentIndex { get; set; }
+
+        public void UpdateDisplay()
+        {
+            if (ValueLabel != null && Options != null && Options.Count > 0)
+            {
+                ValueLabel.text = Options[CurrentIndex];
+            }
+
+            // Update button states
+            LeftButton?.SetEnabled(CurrentIndex > 0);
+            RightButton?.SetEnabled(CurrentIndex < Options.Count - 1);
+        }
     }
 
     private void Awake()
@@ -58,15 +89,16 @@ public class MainMenuEvents : MonoBehaviour
         _document = GetComponent<UIDocument>();
         CacheContainers();
         CacheMainMenuButtons();
-        //CacheSettingsElements();
+        CacheSettingsElements();
     }
 
     private void Start()
     {
         InitializeAudio();
-        //InitializeResolutionSettings();
-        //InitializeQualitySettings();
-        //InitializeVolumeSettings();
+        InitializeResolutionSettings();
+        InitializeQualitySettings();
+        InitializeVolumeSettings();
+        InitializeFullscreenModeSettings();
     }
 
     private void OnEnable()
@@ -103,7 +135,7 @@ public class MainMenuEvents : MonoBehaviour
         _buttons[MenuButton.Settings] = _document.rootVisualElement.Q<Button>("SettingsButton");
         _buttons[MenuButton.Credits] = _document.rootVisualElement.Q<Button>("CreditsButton");
         _buttons[MenuButton.Exit] = _document.rootVisualElement.Q<Button>("ExitButton");
-        _buttons[MenuButton.Back] = _document.rootVisualElement.Q<Button>("BackButton");
+        _buttons[MenuButton.CreditsBack] = _document.rootVisualElement.Q<Button>("CreditsBackButton");
 
         if (string.IsNullOrEmpty(_sceneToLoadFromContinueGame.SceneName)) _buttons[MenuButton.ContinueGame].SetEnabled(false);
     }
@@ -112,22 +144,34 @@ public class MainMenuEvents : MonoBehaviour
     {
         VisualElement settingsContainer = _document.rootVisualElement.Q("SettingsContainer");
 
-        // Graphics settings
-        _qualityDropdown = settingsContainer.Q<DropdownField>("QualityDropdown");
-        _resolutionDropdown = settingsContainer.Q<DropdownField>("ResolutionDropdown");
-        _fullscreenToggle = settingsContainer.Q<Toggle>("FullscreenToggle");
-        _borderlessToggle = settingsContainer.Q<Toggle>("BorderlessToggle");
+        // Initialize setting controls
+        _qualitySetting = new SettingControl();
+        _resolutionSetting = new SettingControl();
+        _fullscreenModeSetting = new SettingControl();
+
+        // Quality setting elements
+        _qualitySetting.LeftButton = settingsContainer.Q<Button>("QualityLeftButton");
+        _qualitySetting.RightButton = settingsContainer.Q<Button>("QualityRightButton");
+        _qualitySetting.ValueLabel = settingsContainer.Q<Label>("QualityValueLabel");
+
+        // Resolution setting elements
+        _resolutionSetting.LeftButton = settingsContainer.Q<Button>("ResolutionLeftButton");
+        _resolutionSetting.RightButton = settingsContainer.Q<Button>("ResolutionRightButton");
+        _resolutionSetting.ValueLabel = settingsContainer.Q<Label>("ResolutionValueLabel");
+
+        // Fullscreen mode setting elements
+        _fullscreenModeSetting.LeftButton = settingsContainer.Q<Button>("FullscreenLeftButton");
+        _fullscreenModeSetting.RightButton = settingsContainer.Q<Button>("FullscreenRightButton");
+        _fullscreenModeSetting.ValueLabel = settingsContainer.Q<Label>("FullscreenValueLabel");
 
         // Audio settings
         _masterVolumeSlider = settingsContainer.Q<Slider>("MasterVolumeSlider");
         _musicVolumeSlider = settingsContainer.Q<Slider>("MusicVolumeSlider");
         _sfxVolumeSlider = settingsContainer.Q<Slider>("SFXVolumeSlider");
         _uiVolumeSlider = settingsContainer.Q<Slider>("UIVolumeSlider");
-        _ambienceVolumeSlider = settingsContainer.Q<Slider>("AmbienceVolumeSlider");
-        _dialogueVolumeSlider = settingsContainer.Q<Slider>("DialogueVolumeSlider");
 
         _settingsBackButton = settingsContainer.Q<Button>("SettingsBackButton");
-        _buttons[MenuButton.Back] = _settingsBackButton;
+        _buttons[MenuButton.SettingsBack] = _settingsBackButton;
     }
 
     private void InitializeAudio()
@@ -146,66 +190,77 @@ public class MainMenuEvents : MonoBehaviour
     {
         // Get available resolutions
         _availableResolutions = Screen.resolutions;
-        _resolutionDropdown.choices.Clear();
+        _uniqueResolutions = new List<Resolution>();
 
         // Filter duplicates
-        var uniqueResolutions = new List<Resolution>();
         foreach (var resolution in _availableResolutions)
         {
-            if (uniqueResolutions.FindIndex(r =>
+            if (_uniqueResolutions.FindIndex(r =>
                 r.width == resolution.width && r.height == resolution.height) == -1)
             {
-                uniqueResolutions.Add(resolution);
+                _uniqueResolutions.Add(resolution);
             }
         }
 
-        // Populate dropdown
-        for (int i = 0; i < uniqueResolutions.Count; i++)
+        // Populate resolution options
+        _resolutionSetting.Options = new List<string>();
+        for (int i = 0; i < _uniqueResolutions.Count; i++)
         {
-            _resolutionDropdown.choices.Add($"{uniqueResolutions[i].width} x {uniqueResolutions[i].height}");
+            _resolutionSetting.Options.Add($"{_uniqueResolutions[i].width} x {_uniqueResolutions[i].height}");
 
-            // Check if current resolution
-            if (uniqueResolutions[i].width == Screen.currentResolution.width &&
-                uniqueResolutions[i].height == Screen.currentResolution.height)
+            if (_uniqueResolutions[i].width == Screen.currentResolution.width &&
+                _uniqueResolutions[i].height == Screen.currentResolution.height)
             {
                 _currentResolutionIndex = i;
+                _resolutionSetting.CurrentIndex = i;
             }
         }
 
-        _resolutionDropdown.index = _currentResolutionIndex;
-        _resolutionDropdown.value = _resolutionDropdown.choices[_currentResolutionIndex];
-
-        // Initialize fullscreen toggles
-        _fullscreenToggle.value = Screen.fullScreen;
-        _borderlessToggle.value = Screen.fullScreenMode == FullScreenMode.FullScreenWindow;
-        _borderlessToggle.SetEnabled(_fullscreenToggle.value);
+        _resolutionSetting.UpdateDisplay();
     }
 
     private void InitializeQualitySettings()
     {
-        // Populate quality dropdown
-        _qualityDropdown.choices = new List<string>(QualitySettings.names);
-        _qualityDropdown.index = QualitySettings.GetQualityLevel();
-        _qualityDropdown.value = QualitySettings.names[QualitySettings.GetQualityLevel()];
+        _qualitySetting.Options = new List<string>(QualitySettings.names);
+        _qualitySetting.CurrentIndex = QualitySettings.GetQualityLevel();
+        _qualitySetting.UpdateDisplay();
     }
 
     private void InitializeVolumeSettings()
     {
-        // Initialize with default values
         _masterVolumeSlider.value = 80;
         _musicVolumeSlider.value = 80;
         _sfxVolumeSlider.value = 80;
         _uiVolumeSlider.value = 80;
-        _ambienceVolumeSlider.value = 80;
-        _dialogueVolumeSlider.value = 80;
 
-        // Set initial volume
         SetVolume("MasterVolume", _masterVolumeSlider.value);
         SetVolume("MusicVolume", _musicVolumeSlider.value);
         SetVolume("SFXVolume", _sfxVolumeSlider.value);
         SetVolume("UIVolume", _uiVolumeSlider.value);
-        SetVolume("AmbienceVolume", _ambienceVolumeSlider.value);
-        SetVolume("DialogueVolume", _dialogueVolumeSlider.value);
+    }
+
+    private void InitializeFullscreenModeSettings()
+    {
+        _fullscreenModeSetting.Options = _fullscreenModes;
+        _fullscreenModeSetting.CurrentIndex = GetCurrentFullscreenModeIndex();
+        _fullscreenModeSetting.UpdateDisplay();
+    }
+
+    private int GetCurrentFullscreenModeIndex()
+    {
+        switch (Screen.fullScreenMode)
+        {
+            case FullScreenMode.FullScreenWindow:
+                return 0;
+            case FullScreenMode.ExclusiveFullScreen:
+                return 1;
+            case FullScreenMode.MaximizedWindow:
+                return 2;
+            case FullScreenMode.Windowed:
+                return 3;
+            default:
+                return 0;
+        }
     }
 
     private void RegisterMainMenuCallbacks()
@@ -228,35 +283,62 @@ public class MainMenuEvents : MonoBehaviour
 
     private void RegisterSettingsCallbacks()
     {
-        // Graphics settings
-        _qualityDropdown.RegisterValueChangedCallback(OnQualityChanged);
-        _resolutionDropdown.RegisterValueChangedCallback(OnResolutionChanged);
-        _fullscreenToggle.RegisterValueChangedCallback(OnFullscreenChanged);
-        _borderlessToggle.RegisterValueChangedCallback(OnBorderlessChanged);
+        // Quality setting navigation
+        _qualitySetting.LeftButton.RegisterCallback<ClickEvent>(evt => NavigateSetting(_qualitySetting, -1, OnQualityChanged));
+        _qualitySetting.RightButton.RegisterCallback<ClickEvent>(evt => NavigateSetting(_qualitySetting, 1, OnQualityChanged));
+
+        // Resolution setting navigation
+        _resolutionSetting.LeftButton.RegisterCallback<ClickEvent>(evt => NavigateSetting(_resolutionSetting, -1, OnResolutionChanged));
+        _resolutionSetting.RightButton.RegisterCallback<ClickEvent>(evt => NavigateSetting(_resolutionSetting, 1, OnResolutionChanged));
+
+        // Fullscreen mode setting navigation
+        _fullscreenModeSetting.LeftButton.RegisterCallback<ClickEvent>(evt => NavigateSetting(_fullscreenModeSetting, -1, OnFullscreenModeChanged));
+        _fullscreenModeSetting.RightButton.RegisterCallback<ClickEvent>(evt => NavigateSetting(_fullscreenModeSetting, 1, OnFullscreenModeChanged));
 
         // Audio settings
         _masterVolumeSlider.RegisterValueChangedCallback(evt => SetVolume("MasterVolume", evt.newValue));
         _musicVolumeSlider.RegisterValueChangedCallback(evt => SetVolume("MusicVolume", evt.newValue));
         _sfxVolumeSlider.RegisterValueChangedCallback(evt => SetVolume("SFXVolume", evt.newValue));
         _uiVolumeSlider.RegisterValueChangedCallback(evt => SetVolume("UIVolume", evt.newValue));
-        _ambienceVolumeSlider.RegisterValueChangedCallback(evt => SetVolume("AmbienceVolume", evt.newValue));
-        _dialogueVolumeSlider.RegisterValueChangedCallback(evt => SetVolume("DialogueVolume", evt.newValue));
 
         // Navigation
-        //_settingsBackButton.RegisterCallback<ClickEvent>(OnBackClick);
+        _settingsBackButton.RegisterCallback<ClickEvent>(HandleMainMenuClick);
     }
 
     private void UnregisterSettingsCallbacks()
     {
-        _qualityDropdown.UnregisterValueChangedCallback(OnQualityChanged);
-        _resolutionDropdown.UnregisterValueChangedCallback(OnResolutionChanged);
-        _fullscreenToggle.UnregisterValueChangedCallback(OnFullscreenChanged);
-        _borderlessToggle.UnregisterValueChangedCallback(OnBorderlessChanged);
+        // Quality setting
+        _qualitySetting.LeftButton.UnregisterCallback<ClickEvent>(evt => NavigateSetting(_qualitySetting, -1, OnQualityChanged));
+        _qualitySetting.RightButton.UnregisterCallback<ClickEvent>(evt => NavigateSetting(_qualitySetting, 1, OnQualityChanged));
 
+        // Resolution setting
+        _resolutionSetting.LeftButton.UnregisterCallback<ClickEvent>(evt => NavigateSetting(_resolutionSetting, -1, OnResolutionChanged));
+        _resolutionSetting.RightButton.UnregisterCallback<ClickEvent>(evt => NavigateSetting(_resolutionSetting, 1, OnResolutionChanged));
+
+        // Fullscreen mode setting
+        _fullscreenModeSetting.LeftButton.UnregisterCallback<ClickEvent>(evt => NavigateSetting(_fullscreenModeSetting, -1, OnFullscreenModeChanged));
+        _fullscreenModeSetting.RightButton.UnregisterCallback<ClickEvent>(evt => NavigateSetting(_fullscreenModeSetting, 1, OnFullscreenModeChanged));
+
+        // Audio settings
         _masterVolumeSlider.UnregisterValueChangedCallback(evt => SetVolume("MasterVolume", evt.newValue));
-        // ... repeat for other sliders ...
+        _musicVolumeSlider.UnregisterValueChangedCallback(evt => SetVolume("MusicVolume", evt.newValue));
+        _sfxVolumeSlider.UnregisterValueChangedCallback(evt => SetVolume("SFXVolume", evt.newValue));
+        _uiVolumeSlider.UnregisterValueChangedCallback(evt => SetVolume("UIVolume", evt.newValue));
 
-        //_settingsBackButton.UnregisterCallback<ClickEvent>(OnBackClick);
+        _settingsBackButton.UnregisterCallback<ClickEvent>(HandleMainMenuClick);
+    }
+
+    private void NavigateSetting(SettingControl setting, int direction, Action changeHandler)
+    {
+        int newIndex = Mathf.Clamp(setting.CurrentIndex + direction, 0, setting.Options.Count - 1);
+
+        if (newIndex != setting.CurrentIndex)
+        {
+            setting.CurrentIndex = newIndex;
+            setting.UpdateDisplay();
+            changeHandler?.Invoke();
+            PlayButtonSound(null);
+        }
     }
 
     private void PlayButtonSound(ClickEvent evt)
@@ -294,20 +376,26 @@ public class MainMenuEvents : MonoBehaviour
 
                     case MenuButton.Settings:
 
-                        ShowContainer("SettingsContainer", true, true, .35f);
                         ShowContainer("MainMenuContainer", false, true, .35f);
+                        ShowContainer("SettingsContainer", true, true, .85f);
                         break;
 
                     case MenuButton.Credits:
 
                         ShowContainer("MainMenuContainer", false, true, .35f);
-                        ShowContainer("CreditsContainer", true, true, 1f);
+                        ShowContainer("CreditsContainer", true, true, .85f);
                         break;
 
-                    case MenuButton.Back:
+                    case MenuButton.CreditsBack:
 
                         ShowContainer("CreditsContainer", false, true, .35f);
-                        ShowContainer("MainMenuContainer", true, true, 1f);
+                        ShowContainer("MainMenuContainer", true, true, .85f);
+                        break;
+
+                    case MenuButton.SettingsBack:
+
+                        ShowContainer("SettingsContainer", false, true, .35f);
+                        ShowContainer("MainMenuContainer", true, true, .85f);
                         break;
 
                     case MenuButton.Exit:
@@ -333,44 +421,39 @@ public class MainMenuEvents : MonoBehaviour
 #endif
     }
 
-    private void OnBackClick(ClickEvent evt)
-    {
-        ShowAllButtons();
-        ShowContainer("MainMenuContainer", true, true, .35f);
-        ShowContainer("SettingsContainer", false, true, .35f);
-        ShowContainer("CreditsContainer", false, true, .35f);
-    }
-
     #region Settings Handlers
-    private void OnQualityChanged(ChangeEvent<string> evt)
+    private void OnQualityChanged()
     {
-        QualitySettings.SetQualityLevel(_qualityDropdown.index);
+        QualitySettings.SetQualityLevel(_qualitySetting.CurrentIndex);
     }
 
-    private void OnResolutionChanged(ChangeEvent<string> evt)
+    private void OnResolutionChanged()
     {
-        _currentResolutionIndex = _resolutionDropdown.index;
-        Resolution resolution = _availableResolutions[_currentResolutionIndex];
-        Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreen);
+        Resolution resolution = _uniqueResolutions[_resolutionSetting.CurrentIndex];
+        Screen.SetResolution(resolution.width, resolution.height, Screen.fullScreenMode);
     }
 
-    private void OnFullscreenChanged(ChangeEvent<bool> evt)
+    private void OnFullscreenModeChanged()
     {
-        Screen.fullScreen = evt.newValue;
-        _borderlessToggle.SetEnabled(evt.newValue);
+        FullScreenMode mode = FullScreenMode.FullScreenWindow;
 
-        // Reset borderless when disabling fullscreen
-        if (!evt.newValue)
+        switch (_fullscreenModeSetting.CurrentIndex)
         {
-            _borderlessToggle.value = false;
+            case 0:
+                mode = FullScreenMode.FullScreenWindow;
+                break;
+            case 1:
+                mode = FullScreenMode.ExclusiveFullScreen;
+                break;
+            case 2:
+                mode = FullScreenMode.MaximizedWindow;
+                break;
+            case 3:
+                mode = FullScreenMode.Windowed;
+                break;
         }
-    }
 
-    private void OnBorderlessChanged(ChangeEvent<bool> evt)
-    {
-        Screen.fullScreenMode = evt.newValue ?
-            FullScreenMode.FullScreenWindow :
-            FullScreenMode.ExclusiveFullScreen;
+        Screen.fullScreenMode = mode;
     }
 
     private void SetVolume(string parameterName, float value)
