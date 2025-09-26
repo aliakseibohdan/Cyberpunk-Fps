@@ -364,13 +364,13 @@ public class MainMenuEvents : MonoBehaviour
 
                     case MenuButton.NewGame:
 
-                        SceneFadeManager.instance.FadeDuration = 3f;
+                        SceneFadeManager.Instance.FadeDuration = 3f;
                         SceneSwapManager.SwapScene(_sceneToLoadFromNewGame);
                         break;
 
                     case MenuButton.ContinueGame:
 
-                        SceneFadeManager.instance.FadeDuration = 3f;
+                        SceneFadeManager.Instance.FadeDuration = 3f;
                         SceneSwapManager.SwapScene(_sceneToLoadFromContinueGame);
                         break;
 

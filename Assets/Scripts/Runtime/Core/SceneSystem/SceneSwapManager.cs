@@ -4,58 +4,66 @@ using UnityEngine.SceneManagement;
 
 public class SceneSwapManager : MonoBehaviour
 {
-    public static SceneSwapManager Instance;
+    public static SceneSwapManager Instance { get; private set; }
+
+    private Coroutine _activeSceneSwapCoroutine;
 
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance != null)
         {
-            Instance = this;
+            Destroy(gameObject);
+            return;
         }
-    }
 
-    private void OnEnable()
-    {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
+        Instance = this;
     }
 
     public static void SwapScene(SceneField sceneToLoad)
     {
-        Instance.StartCoroutine(Instance.FadeOutThenChangeScene(sceneToLoad));
+        if (Instance._activeSceneSwapCoroutine != null)
+        {
+            Instance.StopCoroutine(Instance._activeSceneSwapCoroutine);
+        }
+
+        Instance._activeSceneSwapCoroutine = Instance.StartCoroutine(
+            Instance.FadeOutThenChangeScene(sceneToLoad)
+        );
     }
 
     private IEnumerator FadeOutThenChangeScene(SceneField sceneToLoad)
     {
-        InputManager.Instance.DisableAllInput();
-        SceneFadeManager.instance.FadeOut(SceneFadeManager.FadeType.PlainBlack);
+        InputManager.Instance?.DisableAllInput();
 
-        while (SceneFadeManager.instance.IsFadingOut)
+        SceneFadeManager.Instance.FadeOut(SceneFadeManager.FadeType.PlainBlack);
+
+        yield return new WaitUntil(() => !SceneFadeManager.Instance.IsFadingOut);
+
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad.SceneName);
+        asyncLoad.allowSceneActivation = false;
+
+        while (asyncLoad.progress < 0.9f)
         {
             yield return null;
         }
 
-        SceneManager.LoadScene(sceneToLoad);
+        asyncLoad.allowSceneActivation = true;
+
+        _activeSceneSwapCoroutine = null;
+    }
+
+    // Called by the new scene after it's loaded
+    public void OnNewSceneLoaded()
+    {
+        if (this != Instance) return;
+
+        StartCoroutine(ActivatePlayerControlsAfterFadeIn());
+        SceneFadeManager.Instance.FadeIn(SceneFadeManager.FadeType.PlainBlack);
     }
 
     private IEnumerator ActivatePlayerControlsAfterFadeIn()
     {
-        while(SceneFadeManager.instance.IsFadingIn)
-        {
-            yield return null;
-        }
-
-        InputManager.Instance.EnablePlayerInput();
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        StartCoroutine(ActivatePlayerControlsAfterFadeIn());
-
-        SceneFadeManager.instance.FadeIn(SceneFadeManager.FadeType.PlainBlack);
+        yield return new WaitUntil(() => !SceneFadeManager.Instance.IsFadingIn);
+        InputManager.Instance?.EnablePlayerInput();
     }
 }
