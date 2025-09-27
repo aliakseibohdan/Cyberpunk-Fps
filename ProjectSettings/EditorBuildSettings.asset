@@ -8,6 +8,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Core/MENU_Main.unity
+    guid: 1d2ba125fa752ba439d087d91bfa82a3
+  - enabled: 1
+    path: Assets/Scenes/Levels/LVL2_DeltaMetropolis.unity
+    guid: 67d7aa9f78bcbe54c8bcf82ff339579e
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -12,7 +12,6 @@ public class Initializer : MonoBehaviour
 
         _isInitialized = true;
 
-        // Cache the prefab reference
         if (_persistObjectsPrefab == null)
         {
             _persistObjectsPrefab = Resources.Load<GameObject>("PERSISTOBJECTS");

@@ -16,7 +16,9 @@ public class AudioManager : MonoBehaviour
 
     [Header("Audio Sources")]
     [SerializeField] private AudioSource musicSource;
+    [SerializeField] private AudioSource musicSourceSecondary; // For seamless crossfades
     [SerializeField] private AudioSource ambienceSource;
+    [SerializeField] private AudioSource ambienceSourceSecondary; // For seamless crossfades
     [SerializeField] private int initialPoolSize = 20;
     [SerializeField] private int maxPoolSize = 50;
 
@@ -27,21 +29,27 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float dialogueVolume = 1f;
     [Range(0f, 1f)] public float ambienceVolume = 1f;
 
-    [Header("Fade Optimization")]
+    [Header("Performance Settings")]
     [SerializeField] private int fadeUpdatesPerSecond = 30;
+    [SerializeField] private int cleanupFrameInterval = 15; // Reduced frequency
 
     // Optimized data structures
     private Dictionary<string, AudioClip> audioLibrary;
-    private Dictionary<AudioClip, bool> clipPreloaded;
     private Queue<AudioSource> audioSourcePool;
     private HashSet<AudioSource> activeSources;
     private List<AudioSource> sourcesToReturn;
 
-    // Optimized fade system - no coroutines
+    // Optimized fade system
     private FadeState musicFadeState;
     private FadeState ambienceFadeState;
     private float fadeUpdateInterval;
     private float lastFadeUpdateTime;
+    private int frameCount;
+
+    private AudioSource activeMusicSource;
+    private AudioSource inactiveMusicSource;
+    private AudioSource activeAmbienceSource;
+    private AudioSource inactiveAmbienceSource;
 
     private struct FadeState
     {
@@ -52,6 +60,7 @@ public class AudioManager : MonoBehaviour
         public float duration;
         public AudioClip targetClip;
         public bool isCrossFade;
+        public bool useSecondarySource;
     }
 
     private void Awake()
@@ -74,7 +83,28 @@ public class AudioManager : MonoBehaviour
         sourcesToReturn = new List<AudioSource>(initialPoolSize);
         audioLibrary = new Dictionary<string, AudioClip>();
 
-        // Calculate fade update interval based on desired FPS
+        // Setup dual sources for seamless crossfades
+        if (musicSourceSecondary == null && musicSource != null)
+        {
+            GameObject secondaryMusic = new("MusicSourceSecondary");
+            secondaryMusic.transform.SetParent(transform);
+            musicSourceSecondary = secondaryMusic.AddComponent<AudioSource>();
+            CopyAudioSourceProperties(musicSource, musicSourceSecondary);
+        }
+
+        if (ambienceSourceSecondary == null && ambienceSource != null)
+        {
+            GameObject secondaryAmbience = new("AmbienceSourceSecondary");
+            secondaryAmbience.transform.SetParent(transform);
+            ambienceSourceSecondary = secondaryAmbience.AddComponent<AudioSource>();
+            CopyAudioSourceProperties(ambienceSource, ambienceSourceSecondary);
+        }
+
+        activeMusicSource = musicSource;
+        inactiveMusicSource = musicSourceSecondary;
+        activeAmbienceSource = ambienceSource;
+        inactiveAmbienceSource = ambienceSourceSecondary;
+
         fadeUpdateInterval = 1f / fadeUpdatesPerSecond;
 
         for (int i = 0; i < initialPoolSize; i++)
@@ -88,11 +118,21 @@ public class AudioManager : MonoBehaviour
         ambienceFadeState = new FadeState { isActive = false };
     }
 
+    private void CopyAudioSourceProperties(AudioSource source, AudioSource target)
+    {
+        target.outputAudioMixerGroup = source.outputAudioMixerGroup;
+        target.volume = source.volume;
+        target.pitch = source.pitch;
+        target.loop = source.loop;
+        target.spatialBlend = source.spatialBlend;
+        target.playOnAwake = false;
+    }
+
     private void CreateNewAudioSource()
     {
         if (audioSourcePool.Count >= maxPoolSize) return;
 
-        GameObject sourceObject = new("PooledAudioSource", typeof(AudioSource));
+        GameObject sourceObject = new GameObject("PooledAudioSource", typeof(AudioSource));
         sourceObject.transform.SetParent(transform);
         AudioSource source = sourceObject.GetComponent<AudioSource>();
         source.playOnAwake = false;
@@ -104,121 +144,146 @@ public class AudioManager : MonoBehaviour
     {
         AudioClip[] clips = Resources.LoadAll<AudioClip>("Audio");
         audioLibrary = new Dictionary<string, AudioClip>(clips.Length);
-        clipPreloaded = new Dictionary<AudioClip, bool>(clips.Length);
 
         foreach (AudioClip clip in clips)
         {
             audioLibrary[clip.name] = clip;
-            // Preload audio data to avoid runtime hitches
-            if (clip.loadState == AudioDataLoadState.Unloaded)
-            {
-                clip.LoadAudioData();
-            }
-            clipPreloaded[clip] = true;
+            // Removed preloading - let Unity handle it to avoid hitches
         }
     }
 
     private void Update()
     {
-        float currentTime = Time.time;
+        frameCount++;
 
-        // Only update fades if they're active (early exit)
-        if (musicFadeState.isActive || ambienceFadeState.isActive)
+        // Update fades only when active, at reduced frequency
+        bool needsFadeUpdate = (musicFadeState.isActive || ambienceFadeState.isActive) &&
+                              (Time.time - lastFadeUpdateTime >= fadeUpdateInterval);
+
+        if (needsFadeUpdate)
         {
-            if (currentTime - lastFadeUpdateTime >= fadeUpdateInterval)
-            {
-                UpdateFades();
-                lastFadeUpdateTime = currentTime;
-            }
+            UpdateFades();
+            lastFadeUpdateTime = Time.time;
         }
 
-        // Optimize source cleanup - only check every 10 frames
-        if (activeSources.Count > 0 && Time.frameCount % 10 == 0)
+        // Cleanup sources less frequently
+        if (activeSources.Count > 0 && frameCount % cleanupFrameInterval == 0)
         {
-            sourcesToReturn.Clear();
-
-            foreach (AudioSource source in activeSources)
-            {
-                if (!source.isPlaying)
-                {
-                    sourcesToReturn.Add(source);
-                }
-            }
-
-            foreach (AudioSource source in sourcesToReturn)
-            {
-                ReturnAudioSourceToPool(source);
-                activeSources.Remove(source);
-            }
+            CleanupFinishedSources();
         }
     }
 
     private void UpdateFades()
     {
-        // Budget system: don't spend more than 1ms on audio per frame
-        float startTime = Time.realtimeSinceStartup;
-
+        // No budget system - just update both fades efficiently
         if (musicFadeState.isActive)
         {
-            UpdateFadeState(ref musicFadeState, musicSource);
-            if (Time.realtimeSinceStartup - startTime > 0.001f) return; // Budget exceeded
+            UpdateMusicFade();
         }
 
         if (ambienceFadeState.isActive)
         {
-            UpdateFadeState(ref ambienceFadeState, ambienceSource);
+            UpdateAmbienceFade();
         }
     }
 
-    private void UpdateFadeState(ref FadeState fadeState, AudioSource audioSource)
+    private void UpdateMusicFade()
     {
-        fadeState.currentTime += fadeUpdateInterval;
+        musicFadeState.currentTime += fadeUpdateInterval;
+        float progress = Mathf.Clamp01(musicFadeState.currentTime / musicFadeState.duration);
 
-        float progress = Mathf.Clamp01(fadeState.currentTime / fadeState.duration);
-        float volume = SmoothLerp(fadeState.startVolume, fadeState.targetVolume, progress);
-        audioSource.volume = volume;
+        AudioSource source = musicFadeState.useSecondarySource ? inactiveMusicSource : activeMusicSource;
+        source.volume = LinearLerp(musicFadeState.startVolume, musicFadeState.targetVolume, progress);
 
         if (progress >= 1f)
         {
-            if (fadeState.isCrossFade && fadeState.targetClip != null)
+            HandleFadeCompletion(ref musicFadeState, source, true);
+        }
+    }
+
+    private void UpdateAmbienceFade()
+    {
+        ambienceFadeState.currentTime += fadeUpdateInterval;
+        float progress = Mathf.Clamp01(ambienceFadeState.currentTime / ambienceFadeState.duration);
+
+        AudioSource source = ambienceFadeState.useSecondarySource ? inactiveAmbienceSource : activeAmbienceSource;
+        source.volume = LinearLerp(ambienceFadeState.startVolume, ambienceFadeState.targetVolume, progress);
+
+        if (progress >= 1f)
+        {
+            HandleFadeCompletion(ref ambienceFadeState, source, false);
+        }
+    }
+
+    private void HandleFadeCompletion(ref FadeState fadeState, AudioSource source, bool isMusic)
+    {
+        if (fadeState.isCrossFade && fadeState.targetClip != null)
+        {
+            // For crossfades, prepare the secondary source and swap
+            AudioSource secondarySource = isMusic ? inactiveMusicSource : inactiveAmbienceSource;
+            AudioSource primarySource = isMusic ? activeMusicSource : activeAmbienceSource;
+
+            // Set up secondary source with new clip
+            secondarySource.clip = fadeState.targetClip;
+            secondarySource.volume = 0f;
+            secondarySource.Play();
+
+            // Swap active/inactive sources
+            if (isMusic)
             {
-                // OPTIMIZATION: Instead of calling Stop() and Play() - just swap the clip and let it continue
-                // This avoids the expensive AudioSource.Play() call
-                bool wasPlaying = audioSource.isPlaying;
-                audioSource.clip = fadeState.targetClip;
-
-                // Only start playing if it wasn't already playing or if it stopped
-                if (!wasPlaying)
-                {
-                    audioSource.Play();
-                }
-                // If it was playing, the clip swap happens seamlessly
-
-                // Continue fading in the new clip
-                fadeState.startVolume = 0f;
-                fadeState.targetVolume = fadeState.targetClip == musicSource.clip ? musicVolume : ambienceVolume;
-                fadeState.currentTime = 0f;
-                fadeState.isCrossFade = false;
-                fadeState.targetClip = null;
+                (activeMusicSource, inactiveMusicSource) = (inactiveMusicSource, activeMusicSource);
             }
             else
             {
-                fadeState.isActive = false;
-                audioSource.volume = fadeState.targetVolume;
+                (activeAmbienceSource, inactiveAmbienceSource) = (inactiveAmbienceSource, activeAmbienceSource);
+            }
 
-                // OPTIMIZATION: Only stop if target volume is 0
-                if (fadeState.targetVolume <= 0.01f)
-                {
-                    audioSource.Stop();
-                }
+            // Stop old source
+            source.Stop();
+
+            // Start fade in on new active source
+            fadeState.startVolume = 0f;
+            fadeState.targetVolume = isMusic ? musicVolume : ambienceVolume;
+            fadeState.currentTime = 0f;
+            fadeState.isCrossFade = false;
+            fadeState.targetClip = null;
+            fadeState.useSecondarySource = !fadeState.useSecondarySource;
+        }
+        else
+        {
+            fadeState.isActive = false;
+            source.volume = fadeState.targetVolume;
+
+            if (fadeState.targetVolume <= 0.01f)
+            {
+                source.Stop();
             }
         }
     }
 
-    // Even faster interpolation - removed expensive operations
-    private float SmoothLerp(float a, float b, float t)
+    private void CleanupFinishedSources()
     {
-        // Uses linear interpolation for fade - it's faster and good enough for audio
+        sourcesToReturn.Clear();
+
+        // Use direct iteration without allocation
+        foreach (AudioSource source in activeSources)
+        {
+            if (!source.isPlaying)
+            {
+                sourcesToReturn.Add(source);
+            }
+        }
+
+        foreach (AudioSource source in sourcesToReturn)
+        {
+            ReturnAudioSourceToPool(source);
+            activeSources.Remove(source);
+        }
+    }
+
+    // Fastest possible interpolation
+    private float LinearLerp(float a, float b, float t)
+    {
         return a + (b - a) * t;
     }
 
@@ -243,6 +308,7 @@ public class AudioManager : MonoBehaviour
 
     private AudioSource GetOldestActiveSource()
     {
+        // Quick check for any non-looping, non-essential source
         foreach (AudioSource source in activeSources)
         {
             if (!source.loop && source.outputAudioMixerGroup != dialogueGroup)
@@ -254,8 +320,26 @@ public class AudioManager : MonoBehaviour
             }
         }
 
-        CreateNewAudioSource();
-        return audioSourcePool.Dequeue();
+        // If no suitable source found, expand pool slightly
+        if (audioSourcePool.Count + activeSources.Count < maxPoolSize + 5)
+        {
+            CreateNewAudioSource();
+            return audioSourcePool.Dequeue();
+        }
+
+        // Last resort: use the first available source
+        foreach (AudioSource source in activeSources)
+        {
+            if (source.outputAudioMixerGroup != dialogueGroup)
+            {
+                source.Stop();
+                ReturnAudioSourceToPool(source);
+                activeSources.Remove(source);
+                return GetAudioSource();
+            }
+        }
+
+        return null; // Should rarely happen
     }
 
     private void ReturnAudioSourceToPool(AudioSource source)
@@ -280,6 +364,8 @@ public class AudioManager : MonoBehaviour
         }
 
         AudioSource source = GetAudioSource();
+        if (source == null) return;
+
         source.transform.position = position;
         source.clip = clip;
         source.outputAudioMixerGroup = mixerGroup;
@@ -301,6 +387,8 @@ public class AudioManager : MonoBehaviour
         }
 
         AudioSource source = GetAudioSource();
+        if (source == null) return;
+
         source.transform.position = position;
         source.clip = clip;
         source.outputAudioMixerGroup = mixerGroup;
@@ -332,12 +420,13 @@ public class AudioManager : MonoBehaviour
         musicFadeState = new FadeState
         {
             isActive = true,
-            startVolume = musicSource.volume,
+            startVolume = activeMusicSource.volume,
             targetVolume = 0f,
             currentTime = 0f,
             duration = fadeDuration,
             targetClip = clip,
-            isCrossFade = true
+            isCrossFade = true,
+            useSecondarySource = (activeMusicSource == musicSourceSecondary)
         };
     }
 
@@ -350,26 +439,27 @@ public class AudioManager : MonoBehaviour
         ambienceFadeState = new FadeState
         {
             isActive = true,
-            startVolume = ambienceSource.volume,
+            startVolume = activeAmbienceSource.volume,
             targetVolume = 0f,
             currentTime = 0f,
             duration = fadeDuration,
             targetClip = clip,
-            isCrossFade = true
+            isCrossFade = true,
+            useSecondarySource = (activeAmbienceSource == ambienceSourceSecondary)
         };
     }
 
-    // Simple fade methods
     public void FadeOutMusic(float fadeDuration = 1f)
     {
         musicFadeState = new FadeState
         {
             isActive = true,
-            startVolume = musicSource.volume,
+            startVolume = activeMusicSource.volume,
             targetVolume = 0f,
             currentTime = 0f,
             duration = fadeDuration,
-            isCrossFade = false
+            isCrossFade = false,
+            useSecondarySource = (activeMusicSource == musicSourceSecondary)
         };
     }
 
@@ -378,41 +468,52 @@ public class AudioManager : MonoBehaviour
         ambienceFadeState = new FadeState
         {
             isActive = true,
-            startVolume = ambienceSource.volume,
+            startVolume = activeAmbienceSource.volume,
             targetVolume = 0f,
             currentTime = 0f,
             duration = fadeDuration,
-            isCrossFade = false
+            isCrossFade = false,
+            useSecondarySource = (activeAmbienceSource == ambienceSourceSecondary)
         };
     }
 
     public void FadeInMusic(float fadeDuration = 1f)
     {
-        if (!musicSource.isPlaying) musicSource.Play();
+        if (!activeMusicSource.isPlaying)
+        {
+            activeMusicSource.volume = 0f;
+            activeMusicSource.Play();
+        }
 
         musicFadeState = new FadeState
         {
             isActive = true,
-            startVolume = 0f,
+            startVolume = activeMusicSource.volume,
             targetVolume = musicVolume,
             currentTime = 0f,
             duration = fadeDuration,
-            isCrossFade = false
+            isCrossFade = false,
+            useSecondarySource = (activeMusicSource == musicSourceSecondary)
         };
     }
 
     public void FadeInAmbience(float fadeDuration = 2f)
     {
-        if (!ambienceSource.isPlaying) ambienceSource.Play();
+        if (!activeAmbienceSource.isPlaying)
+        {
+            activeAmbienceSource.volume = 0f;
+            activeAmbienceSource.Play();
+        }
 
         ambienceFadeState = new FadeState
         {
             isActive = true,
-            startVolume = 0f,
+            startVolume = activeAmbienceSource.volume,
             targetVolume = ambienceVolume,
             currentTime = 0f,
             duration = fadeDuration,
-            isCrossFade = false
+            isCrossFade = false,
+            useSecondarySource = (activeAmbienceSource == ambienceSourceSecondary)
         };
     }
 
@@ -426,7 +527,7 @@ public class AudioManager : MonoBehaviour
     {
         musicVolume = Mathf.Clamp01(volume);
         UpdateMixerVolume("MusicVolume", musicVolume);
-        if (!musicFadeState.isActive) musicSource.volume = musicVolume;
+        if (!musicFadeState.isActive) activeMusicSource.volume = musicVolume;
     }
 
     public void SetSFXVolume(float volume)
@@ -445,7 +546,7 @@ public class AudioManager : MonoBehaviour
     {
         ambienceVolume = Mathf.Clamp01(volume);
         UpdateMixerVolume("AmbienceVolume", ambienceVolume);
-        if (!ambienceFadeState.isActive) ambienceSource.volume = ambienceVolume;
+        if (!ambienceFadeState.isActive) activeAmbienceSource.volume = ambienceVolume;
     }
 
     private void UpdateMixerVolume(string parameterName, float volume)
