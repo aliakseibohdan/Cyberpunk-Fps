@@ -132,7 +132,7 @@ public class AudioManager : MonoBehaviour
     {
         if (audioSourcePool.Count >= maxPoolSize) return;
 
-        GameObject sourceObject = new GameObject("PooledAudioSource", typeof(AudioSource));
+        GameObject sourceObject = new("PooledAudioSource", typeof(AudioSource));
         sourceObject.transform.SetParent(transform);
         AudioSource source = sourceObject.GetComponent<AudioSource>();
         source.playOnAwake = false;
@@ -413,7 +413,11 @@ public class AudioManager : MonoBehaviour
 
     public void PlayMusic(string clipName, float fadeDuration = 1f)
     {
-        if (!audioLibrary.TryGetValue(clipName, out AudioClip clip)) return;
+        if (!audioLibrary.TryGetValue(clipName, out AudioClip clip))
+        {
+            Debug.Log("AudioClip not found.");
+            return;
+        }
 
         musicFadeState.isActive = false;
 
