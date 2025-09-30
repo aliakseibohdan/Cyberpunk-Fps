@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class canvasLayerMove : MonoBehaviour
+public class CanvasLayerMove : MonoBehaviour
 {
-
     public Transform _trackedObject;
     public bool _track;
     public float _rotateSpeed;
 
     [HideInInspector] public float _deltaX;
     [HideInInspector] public float _deltaY;
-
 
     // Use this for initialization
     void Start()
@@ -30,23 +28,16 @@ public class canvasLayerMove : MonoBehaviour
 
         if (_track)
         {
-
             if (_rotateSpeed > 0)
             {
-
-                // this.transform.rotation = Quaternion.Lerp(transform.rotation, _trackedObject.rotation, _rotateSpeed * Time.smoothDeltaTime);
-                this.transform.rotation = Quaternion.Lerp(transform.rotation, _trackedObject.rotation, Mathf.SmoothStep(0.0f, 1.0f, _rotateSpeed));
-                this.transform.position = _trackedObject.position;
+                // Snap to position, smooth rotation
+                transform.SetPositionAndRotation(_trackedObject.position, Quaternion.Lerp(transform.rotation, _trackedObject.rotation, Mathf.SmoothStep(0.0f, 1.0f, _rotateSpeed)));
             }
             else
             {
-                if (transform.parent != _trackedObject)
-                {
-
-                    this.transform.parent = _trackedObject;
-                }
+                // Snap to both position and rotation
+                transform.SetPositionAndRotation(_trackedObject.position, _trackedObject.rotation);
             }
         }
-
     }
 }

@@ -44,9 +44,8 @@ public class Player : MonoBehaviour
         var input = _inputActions.Player;
         var deltaTime = Time.deltaTime;
 
-        // Get forward input for camera slide
         var moveInput = input.Move.ReadValue<Vector2>();
-        _forwardInput = moveInput.y; // Y axis is forward/backward
+        _forwardInput = moveInput.y;
 
         var cameraInput = new CameraInput { Look = input.Look.ReadValue<Vector2>() };
         playerCamera.UpdateRotation(cameraInput);

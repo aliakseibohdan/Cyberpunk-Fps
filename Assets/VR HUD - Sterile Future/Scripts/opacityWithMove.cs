@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class opacityWithMove : MonoBehaviour
 {
-    private canvasLayerMove _canvas;
+    private CanvasLayerMove _canvas;
     private Color _defaultColor;
     private SpriteRenderer _sprite;
     public float _speed;
@@ -16,9 +16,9 @@ public class opacityWithMove : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        if (GetComponentInParent<canvasLayerMove>() != null)
+        if (GetComponentInParent<CanvasLayerMove>() != null)
         {
-            _canvas = GetComponentInParent<canvasLayerMove>();
+            _canvas = GetComponentInParent<CanvasLayerMove>();
         }
         _sprite = GetComponent<SpriteRenderer>();
         _defaultColor = _sprite.color;

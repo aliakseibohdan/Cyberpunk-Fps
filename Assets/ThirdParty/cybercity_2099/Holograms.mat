@@ -27,7 +27,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlphaTexture:
-        m_Texture: {fileID: -5390149515647955136, guid: f4601b37471556a40b7a3f4e4c7252fe, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -117,7 +117,7 @@ Material:
     - roughnessFactor: 0.8239417
     - transmissionFactor: 0
     m_Colors:
-    - _Color: {r: 1, g: 0.9817688, b: 0, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - baseColorFactor: {r: 0.9215687, g: 0.7686275, b: 0.09019608, a: 1}
     - baseColorTexture_Rotation: {r: 0, g: 0, b: 0, a: 0}
     - emissiveFactor: {r: 4, g: 4, b: 4, a: 1}
