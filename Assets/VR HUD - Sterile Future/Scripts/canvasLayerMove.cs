@@ -5,6 +5,7 @@ using UnityEngine;
 public class CanvasLayerMove : MonoBehaviour
 {
     public Transform _trackedObject;
+    public Transform _orientation;
     public bool _track;
     public float _rotateSpeed;
 
@@ -30,12 +31,11 @@ public class CanvasLayerMove : MonoBehaviour
         {
             if (_rotateSpeed > 0)
             {
-                // Snap to position, smooth rotation
-                transform.SetPositionAndRotation(_trackedObject.position, Quaternion.Lerp(transform.rotation, _trackedObject.rotation, Mathf.SmoothStep(0.0f, 1.0f, _rotateSpeed)));
+                _orientation.rotation = Quaternion.Lerp(_orientation.rotation, _trackedObject.rotation, Mathf.SmoothStep(0.0f, 1.0f, _rotateSpeed * 2f));
+                transform.SetPositionAndRotation(_trackedObject.position, _orientation.rotation);
             }
             else
             {
-                // Snap to both position and rotation
                 transform.SetPositionAndRotation(_trackedObject.position, _trackedObject.rotation);
             }
         }
