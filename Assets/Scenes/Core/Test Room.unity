@@ -131,6 +131,22 @@ PrefabInstance:
       propertyPath: volume
       value: 
       objectReference: {fileID: 923652991}
+    - target: {fileID: 2199919624934513416, guid: 0eaa3c9f1fb549c469e22d4a882ce561, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2199919624934513416, guid: 0eaa3c9f1fb549c469e22d4a882ce561, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2199919624934513416, guid: 0eaa3c9f1fb549c469e22d4a882ce561, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 303766d4ba021ab49b34ad84345e7d56, type: 2}
+    - target: {fileID: 2199919624934513416, guid: 0eaa3c9f1fb549c469e22d4a882ce561, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 98a2dbd3b7631904a85f9d4d9247f7e8, type: 2}
     - target: {fileID: 4589451299315709174, guid: 0eaa3c9f1fb549c469e22d4a882ce561, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
